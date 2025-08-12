@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信对话模拟器</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 手机框架 -->
+    <div class="phone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span id="current-time">09:41</span>
+            </div>
+            <div class="status-right">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <div class="battery">
+                    <div class="battery-level" id="battery-level"></div>
+                    <div class="battery-dot"></div>
+                </div>
+                <span id="battery-percentage">85%</span>
+            </div>
+        </div>
+
+        <!-- 首页 -->
+        <div id="home-page" class="page active">
+            <div class="home-header">
+                <div class="date-time-container">
+                    <div id="time-display" class="time-display">09:41</div>
+                    <div id="date-display" class="date-display">2024年1月15日 星期一</div>
+                </div>
+            </div>
+            
+            <div class="home-content">
+                <div class="app-grid">
+                    <div class="app-icon" id="wechat-icon">
+                        <i class="fab fa-weixin"></i>
+                        <span>微信</span>
+                    </div>
+                    <div class="app-icon" id="api-icon">
+                        <i class="fas fa-cog"></i>
+                        <span>API设置</span>
+                    </div>
+                    <div class="app-icon" id="worldbook-icon">
+                        <i class="fas fa-book"></i>
+                        <span>世界书</span>
+                    </div>
+                    <div class="app-icon" id="settings-icon">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>设置</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天列表页面 -->
+        <div id="chat-list-page" class="page">
+            <div class="header">
+                <button class="back-btn" id="back-to-home-from-chat-list">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">微信</h1>
+                <button class="add-btn" id="add-character-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="content">
+                <div id="chat-list" class="chat-list">
+                    <!-- 聊天列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加角色页面 -->
+        <div id="add-character-page" class="page">
+            <div class="header">
+                <button class="back-btn" id="back-to-chat-list">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">添加角色</h1>
+            </div>
+            <div class="content">
+                <div class="form-container">
+                    <div class="avatar-upload" id="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                        <div>点击上传头像</div>
+                    </div>
+                    <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                    
+                    <div class="form-group">
+                        <label>角色名称</label>
+                        <input type="text" id="character-name" placeholder="请输入角色名称">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>角色描述</label>
+                        <textarea id="character-description" placeholder="请描述角色的性格、背景等信息"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>温度设置 <span id="temperature-value">0.7</span></label>
+                        <input type="range" id="temperature-slider" min="0" max="2" step="0.1" value="0.7">
+                    </div>
+                    
+                    <button class="save-btn" id="save-character">保存角色</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天页面 -->
+        <div id="chat-page" class="page">
+            <div class="header">
+                <button class="back-btn" id="back-to-chat-list-from-chat">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="chat-header-info">
+                    <h1 class="header-title" id="chat-title">角色名称</h1>
+                    <div class="chat-status" id="chat-status"></div>
+                </div>
+                <button class="more-btn" id="chat-more-btn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+            <div class="content chat-content">
+                <div id="chat-messages" class="chat-messages">
+                    <!-- 聊天消息将在这里动态生成 -->
+                </div>
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="message-input" placeholder="输入消息...">
+                        <button id="send-message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="chat-actions">
+                        <button id="regenerate-btn" class="action-btn">
+                            <i class="fas fa-redo"></i>
+                            重新生成
+                        </button>
+                        <button id="wait-response" class="action-btn">
+                            <i class="fas fa-clock"></i>
+                            等待回复
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 角色设置页面 -->
+        <div id="character-settings-page" class="page">
+            <div class="header">
+                <button class="back-btn" id="back-to-chat-from-settings">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">聊天设置</h1>
+            </div>
+            <div class="content">
+                <div class="settings-container">
+                    <!-- 角色设置 -->
+                    <div class="settings-section">
+                        <h3>角色设置</h3>
+                        <div class="avatar-upload" id="settings-avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                            <div>点击更换角色头像</div>
+                        </div>
+                        <input type="file" id="settings-avatar-input" accept="image/*" style="display: none;">
+                        
+                        <div class="form-group">
+                            <label>角色名称</label>
+                            <input type="text" id="settings-character-name" placeholder="请输入角色名称">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>角色人设</label>
+                            <textarea id="settings-character-description" placeholder="请描述角色的性格、背景等信息"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 我的设置 -->
+                    <div class="settings-section">
+                        <h3>我的设置</h3>
+                        <div class="avatar-upload" id="my-avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                            <div>点击更换我的头像</div>
+                        </div>
+                        <input type="file" id="my-avatar-input" accept="image/*" style="display: none;">
+                        
+                        <div class="form-group">
+                            <label>我的名称</label>
+                            <input type="text" id="my-name" placeholder="请输入您的名称" value="我">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>我的人设</label>
+                            <textarea id="my-description" placeholder="请描述您的背景、性格等信息"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 世界书设置 -->
+                    <div class="settings-section">
+                        <h3>世界书设置</h3>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enable-worldbook">
+                                <span class="checkmark"></span>
+                                启用世界书
+                            </label>
+                        </div>
+                        
+                        <div id="worldbook-selection" class="worldbook-selection" style="display: none;">
+                            <label>选择世界书</label>
+                            <div id="worldbook-slider" class="worldbook-slider">
+                                <!-- 世界书卡片将在这里动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="save-btn" id="save-character-settings">保存设置</button>
+                        <button class="delete-btn" id="delete-character-btn">删除角色</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API设置页面 -->
+        <div id="api-page" class="page">
+            <div class="header">
+                <button class="back-btn" id="back-to-home-from-api">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">API设置</h1>
+            </div>
+            <div class="content">
+                <div class="form-container">
+                    <div class="form-group">
+                        <label>API地址</label>
+                        <input type="text" id="api-url" placeholder="https://api.openai.com/v1/chat/completions">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>API密钥</label>
+                        <input type="password" id="api-key" placeholder="请输入API密钥">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>模型选择</label>
+                        <select id="model-select" disabled>
+                            <option value="">请先获取模型列表</option>
+                        </select>
+                        <button class="fetch-btn" id="fetch-models-btn">获取模型列表</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>温度设置 <span id="temperature-value">0.7</span></label>
+                        <input type="range" id="temperature-slider" min="0" max="2" step="0.1" value="0.7">
+                    </div>
+                    
+                    <div class="api-actions">
+                        <button class="test-btn" id="test-connection">测试连接</button>
+                        <button class="save-btn" id="save-api-settings-btn">保存设置</button>
+                    </div>
+                    
+                    <div id="connection-status" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 世界书页面 -->
+        <div id="worldbook-page" class="page">
+            <div class="header">
+                <button class="back-btn" id="back-to-home-from-worldbook">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="header-title">世界书</h1>
+                <button class="add-btn" id="add-worldbook">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="content">
+                <!-- 世界书列表视图 -->
+                <div id="worldbook-list-view">
+                    <div id="worldbook-display-list" class="chat-list">
+                        <!-- 世界书列表将在这里动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 世界书创建/编辑视图 -->
+                <div id="worldbook-create-view" style="display: none;">
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label>世界书名称</label>
+                            <input type="text" id="worldbook-name" placeholder="请输入世界书名称">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>分类</label>
+                            <select id="worldbook-category-select">
+                                <option value="fantasy">🧙‍♂️ 奇幻</option>
+                                <option value="scifi">🚀 科幻</option>
+                                <option value="modern">🏙️ 现代</option>
+                                <option value="historical">🏛️ 历史</option>
+                                <option value="romance">💕 言情</option>
+                                <option value="custom">✨ 自定义</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>世界书内容</label>
+                            <textarea id="worldbook-content" placeholder="请输入世界观设定、背景故事等内容"></textarea>
+                        </div>
+                        
+                        <div class="worldbook-actions">
+                            <button class="cancel-btn" id="cancel-worldbook">取消</button>
+                            <button class="save-btn" id="save-worldbook">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义弹窗 -->
+    <div id="custom-modal-overlay" class="modal-overlay">
+        <div id="custom-modal" class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">提示</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">这是一条消息</p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel" class="modal-btn cancel">取消</button>
+                <button id="modal-confirm" class="modal-btn confirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
