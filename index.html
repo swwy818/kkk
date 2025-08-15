@@ -2,336 +2,563 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     <title>微信对话模拟器</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- 手机框架 -->
-    <div class="phone-frame">
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <div class="status-left">
-                <span id="current-time">09:41</span>
-            </div>
-            <div class="status-right">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <div class="battery">
-                    <div class="battery-level" id="battery-level"></div>
-                    <div class="battery-dot"></div>
+    <!-- 手机外壳 -->
+    <div id="phone-container">
+        <div id="phone-screen">
+            <!-- 状态栏 -->
+            <div id="status-bar">
+                <div class="status-left">
+                    <span id="current-time">19:02</span>
                 </div>
-                <span id="battery-percentage">85%</span>
+                <div class="status-right">
+                    <i id="battery-icon" class="fas fa-battery-full"></i>
+                    <span id="battery-level" class="battery-text">100%</span>
+                </div>
             </div>
-        </div>
 
-        <!-- 首页 -->
-        <div id="home-page" class="page active">
-            <div class="home-header">
-                <div class="date-time-container">
-                    <div id="time-display" class="time-display">09:41</div>
-                    <div id="date-display" class="date-display">2024年1月15日 星期一</div>
+            <!-- 首页 -->
+            <div id="home-page" class="page active">
+                <div class="home-header">
+                    <div class="date-time-display">
+                        <div id="current-date" class="current-date">2025年8月13日 星期二</div>
+                        <div id="current-full-time" class="current-time">20:00</div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="home-content">
-                <div class="app-grid">
-                    <div class="app-icon" id="wechat-icon">
-                        <i class="fab fa-weixin"></i>
+                <div class="home-icons">
+                    <div class="home-icon" id="wechat-icon">
+                        <div class="icon-image">
+                            <i class="fab fa-weixin"></i>
+                        </div>
                         <span>微信</span>
                     </div>
-                    <div class="app-icon" id="api-icon">
-                        <i class="fas fa-cog"></i>
+                    <div class="home-icon" id="api-icon">
+                        <div class="icon-image">
+                            <i class="fas fa-cog"></i>
+                        </div>
                         <span>API设置</span>
                     </div>
-                    <div class="app-icon" id="worldbook-icon">
-                        <i class="fas fa-book"></i>
+                </div>
+                <div class="home-icons">
+                    <div class="home-icon" id="worldbook-icon">
+                        <div class="icon-image">
+                            <i class="fas fa-book"></i>
+                        </div>
                         <span>世界书</span>
                     </div>
-                    <div class="app-icon" id="settings-icon">
-                        <i class="fas fa-sliders-h"></i>
+                    <div class="home-icon" id="settings-icon">
+                        <div class="icon-image">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
                         <span>设置</span>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 聊天列表页面 -->
-        <div id="chat-list-page" class="page">
-            <div class="header">
-                <button class="back-btn" id="back-to-home-from-chat-list">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="header-title">微信</h1>
-                <button class="add-btn" id="add-character-btn">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-            <div class="content">
-                <div id="chat-list" class="chat-list">
-                    <!-- 聊天列表将在这里动态生成 -->
+            <!-- 首页设置页面 -->
+            <div id="home-settings-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-home-from-settings">‹</span>
+                    <span class="header-title">设置</span>
+                    <span class="exit-btn" id="exit-app">退出</span>
+                </div>
+                <div class="form-container">
+                    <div class="form-section">
+                        <h3>壁纸设置</h3>
+                        <div class="form-group">
+                            <label>首页背景壁纸</label>
+                            <div class="wallpaper-preview" id="home-wallpaper-preview">
+                                <div class="wallpaper-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <div>点击更换壁纸</div>
+                                </div>
+                            </div>
+                            <input type="file" id="home-wallpaper-input" accept="image/*" style="display: none;">
+                            <button class="form-button-secondary" onclick="document.getElementById('home-wallpaper-input').click()">选择壁纸</button>
+                            <button class="form-button-secondary" id="reset-home-wallpaper">恢复默认</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>显示设置</h3>
+                        <div class="form-group">
+                            <label>手机边框</label>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="form-button-secondary" id="phone-frame-enabled">有边框</button>
+                                <button class="form-button-secondary" id="phone-frame-disabled">无边框</button>
+                            </div>
+                            <div class="input-hint">选择是否显示手机外壳边框</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 添加角色页面 -->
-        <div id="add-character-page" class="page">
-            <div class="header">
-                <button class="back-btn" id="back-to-chat-list">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="header-title">添加角色</h1>
-            </div>
-            <div class="content">
-                <div class="form-container">
-                    <div class="avatar-upload" id="avatar-placeholder">
-                        <i class="fas fa-user"></i>
-                        <div>点击上传头像</div>
+            <!-- 聊天列表页面 -->
+            <div id="chat-list-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-home">‹</span>
+                    <span class="header-title">微信</span>
+                    <span class="add-btn" id="add-character-btn">+</span>
+                </div>
+                <div id="chat-list" class="list-container">
+                    <!-- 聊天列表将由JS动态生成 -->
+                </div>
+                <div class="bottom-nav">
+                    <div class="nav-item active" data-view="chat-list">
+                        <i class="fas fa-comment"></i>
+                        <span>微信</span>
                     </div>
-                    <input type="file" id="avatar-input" accept="image/*" style="display: none;">
-                    
+                    <div class="nav-item" data-view="memories">
+                        <i class="fas fa-heart"></i>
+                        <span>回忆</span>
+                    </div>
+                    <div class="nav-item" data-view="moments">
+                        <i class="fas fa-camera"></i>
+                        <span>朋友圈</span>
+                    </div>
+                    <div class="nav-item" data-view="settings">
+                        <i class="fas fa-user"></i>
+                        <span>我</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 添加角色页面 -->
+            <div id="add-character-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-chat-list">‹</span>
+                    <span class="header-title">添加角色</span>
+                    <span class="save-btn" id="save-character">保存</span>
+                </div>
+                <div class="form-container">
+                    <div class="avatar-upload-section">
+                        <div class="avatar-placeholder" id="avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                            <div>点击上传头像</div>
+                        </div>
+                        <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                    </div>
                     <div class="form-group">
-                        <label>角色名称</label>
+                        <label for="character-name">角色名称</label>
                         <input type="text" id="character-name" placeholder="请输入角色名称">
                     </div>
-                    
                     <div class="form-group">
-                        <label>角色描述</label>
-                        <textarea id="character-description" placeholder="请描述角色的性格、背景等信息"></textarea>
+                        <label for="character-description">角色人设</label>
+                        <textarea id="character-description" placeholder="请输入角色的性格、背景等人设信息"></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>温度设置 <span id="temperature-value">0.7</span></label>
-                        <input type="range" id="temperature-slider" min="0" max="2" step="0.1" value="0.7">
-                    </div>
-                    
-                    <button class="save-btn" id="save-character">保存角色</button>
                 </div>
             </div>
-        </div>
 
-        <!-- 聊天页面 -->
-        <div id="chat-page" class="page">
-            <div class="header">
-                <button class="back-btn" id="back-to-chat-list-from-chat">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <div class="chat-header-info">
-                    <h1 class="header-title" id="chat-title">角色名称</h1>
-                    <div class="chat-status" id="chat-status"></div>
+            <!-- 聊天界面 -->
+            <div id="chat-page" class="page">
+                <div class="header chat-header">
+                    <span class="back-btn" id="back-to-chat-list-from-chat">‹</span>
+                    <div class="chat-title-wrapper">
+                        <span class="chat-title" id="chat-title">聊天对象</span>
+                        <span class="chat-status" id="chat-status"></span>
+                    </div>
+                    <span class="more-btn" id="chat-more-btn">⋯</span>
                 </div>
-                <button class="more-btn" id="chat-more-btn">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-            </div>
-            <div class="content chat-content">
                 <div id="chat-messages" class="chat-messages">
-                    <!-- 聊天消息将在这里动态生成 -->
+                    <!-- 聊天消息将由JS动态生成 -->
                 </div>
-                <div class="chat-input-container">
-                    <div class="chat-input-wrapper">
-                        <input type="text" id="message-input" placeholder="输入消息...">
-                        <button id="send-message">
-                            <i class="fas fa-paper-plane"></i>
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <button id="emoji-btn" class="emoji-btn" title="表情包">
+                            <i class="fas fa-smile"></i>
                         </button>
-                    </div>
-                    <div class="chat-actions">
-                        <button id="regenerate-btn" class="action-btn">
+                        <input type="text" id="message-input" placeholder="请输入消息...">
+                        <button id="regenerate-response" class="regenerate-btn" title="重新回复">
                             <i class="fas fa-redo"></i>
-                            重新生成
                         </button>
-                        <button id="wait-response" class="action-btn">
-                            <i class="fas fa-clock"></i>
-                            等待回复
-                        </button>
+                        <button id="wait-response" class="wait-btn">等待回复</button>
+                        <button id="send-message" class="send-btn">发送</button>
+                    </div>
+                    <!-- 表情包面板 -->
+                    <div id="emoji-panel" class="emoji-panel" style="display: none;">
+                        <div class="emoji-grid">
+                            <div class="emoji-item" data-emoji="😀">😀</div>
+                            <div class="emoji-item" data-emoji="😃">😃</div>
+                            <div class="emoji-item" data-emoji="😄">😄</div>
+                            <div class="emoji-item" data-emoji="😁">😁</div>
+                            <div class="emoji-item" data-emoji="😆">😆</div>
+                            <div class="emoji-item" data-emoji="😅">😅</div>
+                            <div class="emoji-item" data-emoji="😂">😂</div>
+                            <div class="emoji-item" data-emoji="🤣">🤣</div>
+                            <div class="emoji-item" data-emoji="😊">😊</div>
+                            <div class="emoji-item" data-emoji="😇">😇</div>
+                            <div class="emoji-item" data-emoji="🙂">🙂</div>
+                            <div class="emoji-item" data-emoji="🙃">🙃</div>
+                            <div class="emoji-item" data-emoji="😉">😉</div>
+                            <div class="emoji-item" data-emoji="😌">😌</div>
+                            <div class="emoji-item" data-emoji="😍">😍</div>
+                            <div class="emoji-item" data-emoji="🥰">🥰</div>
+                            <div class="emoji-item" data-emoji="😘">😘</div>
+                            <div class="emoji-item" data-emoji="😗">😗</div>
+                            <div class="emoji-item" data-emoji="😙">😙</div>
+                            <div class="emoji-item" data-emoji="😚">😚</div>
+                            <div class="emoji-item" data-emoji="😋">😋</div>
+                            <div class="emoji-item" data-emoji="😛">😛</div>
+                            <div class="emoji-item" data-emoji="😝">😝</div>
+                            <div class="emoji-item" data-emoji="😜">😜</div>
+                            <div class="emoji-item" data-emoji="🤪">🤪</div>
+                            <div class="emoji-item" data-emoji="🤨">🤨</div>
+                            <div class="emoji-item" data-emoji="🧐">🧐</div>
+                            <div class="emoji-item" data-emoji="🤓">🤓</div>
+                            <div class="emoji-item" data-emoji="😎">😎</div>
+                            <div class="emoji-item" data-emoji="🤩">🤩</div>
+                            <div class="emoji-item" data-emoji="🥳">🥳</div>
+                            <div class="emoji-item" data-emoji="😏">😏</div>
+                            <div class="emoji-item" data-emoji="😒">😒</div>
+                            <div class="emoji-item" data-emoji="😞">😞</div>
+                            <div class="emoji-item" data-emoji="😔">😔</div>
+                            <div class="emoji-item" data-emoji="😟">😟</div>
+                            <div class="emoji-item" data-emoji="😕">😕</div>
+                            <div class="emoji-item" data-emoji="🙁">🙁</div>
+                            <div class="emoji-item" data-emoji="☹️">☹️</div>
+                            <div class="emoji-item" data-emoji="😣">😣</div>
+                            <div class="emoji-item" data-emoji="😖">😖</div>
+                            <div class="emoji-item" data-emoji="😫">😫</div>
+                            <div class="emoji-item" data-emoji="😩">😩</div>
+                            <div class="emoji-item" data-emoji="🥺">🥺</div>
+                            <div class="emoji-item" data-emoji="😢">😢</div>
+                            <div class="emoji-item" data-emoji="😭">😭</div>
+                            <div class="emoji-item" data-emoji="😤">😤</div>
+                            <div class="emoji-item" data-emoji="😠">😠</div>
+                            <div class="emoji-item" data-emoji="😡">😡</div>
+                            <div class="emoji-item" data-emoji="🤬">🤬</div>
+                            <div class="emoji-item" data-emoji="🤯">🤯</div>
+                            <div class="emoji-item" data-emoji="😳">😳</div>
+                            <div class="emoji-item" data-emoji="🥵">🥵</div>
+                            <div class="emoji-item" data-emoji="🥶">🥶</div>
+                            <div class="emoji-item" data-emoji="😱">😱</div>
+                            <div class="emoji-item" data-emoji="😨">😨</div>
+                            <div class="emoji-item" data-emoji="😰">😰</div>
+                            <div class="emoji-item" data-emoji="😥">😥</div>
+                            <div class="emoji-item" data-emoji="😓">😓</div>
+                            <div class="emoji-item" data-emoji="🤗">🤗</div>
+                            <div class="emoji-item" data-emoji="🤔">🤔</div>
+                            <div class="emoji-item" data-emoji="🤭">🤭</div>
+                            <div class="emoji-item" data-emoji="🤫">🤫</div>
+                            <div class="emoji-item" data-emoji="🤥">🤥</div>
+                            <div class="emoji-item" data-emoji="😶">😶</div>
+                            <div class="emoji-item" data-emoji="😐">😐</div>
+                            <div class="emoji-item" data-emoji="😑">😑</div>
+                            <div class="emoji-item" data-emoji="😬">😬</div>
+                            <div class="emoji-item" data-emoji="🙄">🙄</div>
+                            <div class="emoji-item" data-emoji="😯">😯</div>
+                            <div class="emoji-item" data-emoji="😦">😦</div>
+                            <div class="emoji-item" data-emoji="😧">😧</div>
+                            <div class="emoji-item" data-emoji="😮">😮</div>
+                            <div class="emoji-item" data-emoji="😲">😲</div>
+                            <div class="emoji-item" data-emoji="🥱">🥱</div>
+                            <div class="emoji-item" data-emoji="😴">😴</div>
+                            <div class="emoji-item" data-emoji="🤤">🤤</div>
+                            <div class="emoji-item" data-emoji="😪">😪</div>
+                            <div class="emoji-item" data-emoji="😵">😵</div>
+                            <div class="emoji-item" data-emoji="🤐">🤐</div>
+                            <div class="emoji-item" data-emoji="🥴">🥴</div>
+                            <div class="emoji-item" data-emoji="🤢">🤢</div>
+                            <div class="emoji-item" data-emoji="🤮">🤮</div>
+                            <div class="emoji-item" data-emoji="🤧">🤧</div>
+                            <div class="emoji-item" data-emoji="😷">😷</div>
+                            <div class="emoji-item" data-emoji="🤒">🤒</div>
+                            <div class="emoji-item" data-emoji="🤕">🤕</div>
+                            <div class="emoji-item" data-emoji="🤑">🤑</div>
+                            <div class="emoji-item" data-emoji="🤠">🤠</div>
+                            <div class="emoji-item" data-emoji="😈">😈</div>
+                            <div class="emoji-item" data-emoji="👿">👿</div>
+                            <div class="emoji-item" data-emoji="👹">👹</div>
+                            <div class="emoji-item" data-emoji="👺">👺</div>
+                            <div class="emoji-item" data-emoji="🤡">🤡</div>
+                            <div class="emoji-item" data-emoji="💩">💩</div>
+                            <div class="emoji-item" data-emoji="👻">👻</div>
+                            <div class="emoji-item" data-emoji="💀">💀</div>
+                            <div class="emoji-item" data-emoji="☠️">☠️</div>
+                            <div class="emoji-item" data-emoji="👽">👽</div>
+                            <div class="emoji-item" data-emoji="👾">👾</div>
+                            <div class="emoji-item" data-emoji="🤖">🤖</div>
+                            <div class="emoji-item" data-emoji="🎃">🎃</div>
+                            <div class="emoji-item" data-emoji="😺">😺</div>
+                            <div class="emoji-item" data-emoji="😸">😸</div>
+                            <div class="emoji-item" data-emoji="😹">😹</div>
+                            <div class="emoji-item" data-emoji="😻">😻</div>
+                            <div class="emoji-item" data-emoji="😼">😼</div>
+                            <div class="emoji-item" data-emoji="😽">😽</div>
+                            <div class="emoji-item" data-emoji="🙀">🙀</div>
+                            <div class="emoji-item" data-emoji="😿">😿</div>
+                            <div class="emoji-item" data-emoji="😾">😾</div>
+                            <div class="emoji-item" data-emoji="❤️">❤️</div>
+                            <div class="emoji-item" data-emoji="🧡">🧡</div>
+                            <div class="emoji-item" data-emoji="💛">💛</div>
+                            <div class="emoji-item" data-emoji="💚">💚</div>
+                            <div class="emoji-item" data-emoji="💙">💙</div>
+                            <div class="emoji-item" data-emoji="💜">💜</div>
+                            <div class="emoji-item" data-emoji="🤎">🤎</div>
+                            <div class="emoji-item" data-emoji="🖤">🖤</div>
+                            <div class="emoji-item" data-emoji="🤍">🤍</div>
+                            <div class="emoji-item" data-emoji="💔">💔</div>
+                            <div class="emoji-item" data-emoji="❣️">❣️</div>
+                            <div class="emoji-item" data-emoji="💕">💕</div>
+                            <div class="emoji-item" data-emoji="💞">💞</div>
+                            <div class="emoji-item" data-emoji="💓">💓</div>
+                            <div class="emoji-item" data-emoji="💗">💗</div>
+                            <div class="emoji-item" data-emoji="💖">💖</div>
+                            <div class="emoji-item" data-emoji="💘">💘</div>
+                            <div class="emoji-item" data-emoji="💝">💝</div>
+                            <div class="emoji-item" data-emoji="💟">💟</div>
+                            <div class="emoji-item" data-emoji="👍">👍</div>
+                            <div class="emoji-item" data-emoji="👎">👎</div>
+                            <div class="emoji-item" data-emoji="👌">👌</div>
+                            <div class="emoji-item" data-emoji="🤌">🤌</div>
+                            <div class="emoji-item" data-emoji="🤏">🤏</div>
+                            <div class="emoji-item" data-emoji="✌️">✌️</div>
+                            <div class="emoji-item" data-emoji="🤞">🤞</div>
+                            <div class="emoji-item" data-emoji="🤟">🤟</div>
+                            <div class="emoji-item" data-emoji="🤘">🤘</div>
+                            <div class="emoji-item" data-emoji="🤙">🤙</div>
+                            <div class="emoji-item" data-emoji="👈">👈</div>
+                            <div class="emoji-item" data-emoji="👉">👉</div>
+                            <div class="emoji-item" data-emoji="👆">👆</div>
+                            <div class="emoji-item" data-emoji="🖕">🖕</div>
+                            <div class="emoji-item" data-emoji="👇">👇</div>
+                            <div class="emoji-item" data-emoji="☝️">☝️</div>
+                            <div class="emoji-item" data-emoji="👋">👋</div>
+                            <div class="emoji-item" data-emoji="🤚">🤚</div>
+                            <div class="emoji-item" data-emoji="🖐️">🖐️</div>
+                            <div class="emoji-item" data-emoji="✋">✋</div>
+                            <div class="emoji-item" data-emoji="🖖">🖖</div>
+                            <div class="emoji-item" data-emoji="👏">👏</div>
+                            <div class="emoji-item" data-emoji="🙌">🙌</div>
+                            <div class="emoji-item" data-emoji="🤝">🤝</div>
+                            <div class="emoji-item" data-emoji="🙏">🙏</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 角色设置页面 -->
-        <div id="character-settings-page" class="page">
-            <div class="header">
-                <button class="back-btn" id="back-to-chat-from-settings">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="header-title">聊天设置</h1>
-            </div>
-            <div class="content">
-                <div class="settings-container">
-                    <!-- 角色设置 -->
-                    <div class="settings-section">
-                        <h3>角色设置</h3>
-                        <div class="avatar-upload" id="settings-avatar-placeholder">
-                            <i class="fas fa-user"></i>
-                            <div>点击更换角色头像</div>
+            <!-- 角色设置页面 -->
+            <div id="character-settings-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-chat-from-settings">‹</span>
+                    <span class="header-title">角色设置</span>
+                    <span class="save-btn" id="save-character-settings">保存</span>
+                </div>
+                <div class="form-container">
+                    <!-- AI角色头像和人设 -->
+                    <div class="form-section">
+                        <h3>AI角色设置</h3>
+                        <div class="avatar-upload-section">
+                            <div class="avatar-placeholder" id="settings-avatar-placeholder">
+                                <i class="fas fa-user"></i>
+                                <div>点击更换头像</div>
+                            </div>
+                            <input type="file" id="settings-avatar-input" accept="image/*" style="display: none;">
                         </div>
-                        <input type="file" id="settings-avatar-input" accept="image/*" style="display: none;">
-                        
                         <div class="form-group">
-                            <label>角色名称</label>
-                            <input type="text" id="settings-character-name" placeholder="请输入角色名称">
+                            <label for="settings-character-name">角色昵称</label>
+                            <input type="text" id="settings-character-name" placeholder="请输入角色昵称">
                         </div>
-                        
                         <div class="form-group">
-                            <label>角色人设</label>
-                            <textarea id="settings-character-description" placeholder="请描述角色的性格、背景等信息"></textarea>
+                            <label for="settings-character-description">角色人设 (AI Persona)</label>
+                            <textarea id="settings-character-description" placeholder="请输入角色的性格、背景等人设信息"></textarea>
                         </div>
                     </div>
 
                     <!-- 我的设置 -->
-                    <div class="settings-section">
+                    <div class="form-section">
                         <h3>我的设置</h3>
-                        <div class="avatar-upload" id="my-avatar-placeholder">
-                            <i class="fas fa-user"></i>
-                            <div>点击更换我的头像</div>
-                        </div>
-                        <input type="file" id="my-avatar-input" accept="image/*" style="display: none;">
-                        
                         <div class="form-group">
-                            <label>我的名称</label>
-                            <input type="text" id="my-name" placeholder="请输入您的名称" value="我">
+                            <label>我的头像</label>
+                            <div class="avatar-upload-section">
+                                <div class="avatar-placeholder" id="my-avatar-preview">
+                                    <i class="fas fa-user"></i>
+                                    <div>点击上传头像</div>
+                                </div>
+                                <input type="file" id="my-avatar-input" accept="image/*" style="display: none;">
+                            </div>
                         </div>
-                        
                         <div class="form-group">
-                            <label>我的人设</label>
-                            <textarea id="my-description" placeholder="请描述您的背景、性格等信息"></textarea>
+                            <label for="my-persona">我的人设 (My Persona)</label>
+                            <textarea id="my-persona" rows="3" placeholder="请输入你的人设信息，这会影响AI如何与你互动"></textarea>
                         </div>
                     </div>
 
                     <!-- 世界书设置 -->
-                    <div class="settings-section">
+                    <div class="form-section">
                         <h3>世界书设置</h3>
                         <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="enable-worldbook">
-                                <span class="checkmark"></span>
-                                启用世界书
-                            </label>
-                        </div>
-                        
-                        <div id="worldbook-selection" class="worldbook-selection" style="display: none;">
-                            <label>选择世界书</label>
-                            <div id="worldbook-slider" class="worldbook-slider">
-                                <!-- 世界书卡片将在这里动态生成 -->
+                            <label>关联世界书 (可多选)</label>
+                            <div class="custom-multiselect">
+                                <div class="select-box">
+                                    <span class="selected-options-text">-- 点击选择 --</span>
+                                    <span class="arrow-down">▼</span>
+                                </div>
+                                <div id="world-book-checkboxes-container" class="checkboxes-container">
+                                    <!-- 世界书选项将由JS动态生成 -->
+                                </div>
                             </div>
+                            <div class="input-hint">选择要在对话中使用的世界书，AI会根据这些设定进行回复</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-world-book">额外世界书设定</label>
+                            <textarea id="settings-world-book" placeholder="请输入额外的世界观、背景故事等设定信息"></textarea>
+                            <div class="input-hint">这里的内容会与选中的世界书一起使用</div>
                         </div>
                     </div>
 
-                    <div class="settings-actions">
-                        <button class="save-btn" id="save-character-settings">保存设置</button>
-                        <button class="delete-btn" id="delete-character-btn">删除角色</button>
+                    <!-- 聊天背景设置 -->
+                    <div class="form-section">
+                        <h3>聊天背景</h3>
+                        <div class="form-group">
+                            <label>私聊背景壁纸</label>
+                            <div class="wallpaper-preview" id="chat-wallpaper-preview">
+                                <div class="wallpaper-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <div>点击更换背景</div>
+                                </div>
+                            </div>
+                            <input type="file" id="chat-wallpaper-input" accept="image/*" style="display: none;">
+                            <button class="form-button-secondary" onclick="document.getElementById('chat-wallpaper-input').click()">选择背景</button>
+                            <button class="form-button-secondary" id="reset-chat-wallpaper">恢复默认</button>
+                            <div class="input-hint">此背景仅对当前角色的私聊界面生效</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="form-button-danger" id="delete-character-btn">删除角色</button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- API设置页面 -->
-        <div id="api-page" class="page">
-            <div class="header">
-                <button class="back-btn" id="back-to-home-from-api">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="header-title">API设置</h1>
+            <!-- 回忆页面 -->
+            <div id="memories-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-chat-list-from-memories">‹</span>
+                    <span class="header-title">我们的回忆</span>
+                    <span class="add-btn" id="add-memory-btn">+</span>
+                </div>
+                <div id="memories-list" class="list-container">
+                    <!-- 回忆列表将由JS动态生成 -->
+                </div>
             </div>
-            <div class="content">
+
+            <!-- 朋友圈页面 -->
+            <div id="moments-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-chat-list-from-moments">‹</span>
+                    <span class="header-title">朋友圈</span>
+                    <span class="add-btn" id="add-moment-btn">+</span>
+                </div>
+                <div id="moments-list" class="list-container">
+                    <!-- 朋友圈列表将由JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 世界书管理页面 -->
+            <div id="worldbook-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-home-from-worldbook">‹</span>
+                    <span class="header-title">世界书</span>
+                    <span class="add-btn" id="add-worldbook-btn">+</span>
+                </div>
+                <div id="worldbook-list" class="list-container">
+                    <!-- 世界书列表将由JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 世界书编辑页面 -->
+            <div id="worldbook-editor-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-worldbook-from-editor">‹</span>
+                    <span class="header-title" id="worldbook-editor-title">编辑世界书</span>
+                    <span class="save-btn" id="save-worldbook-btn">保存</span>
+                </div>
                 <div class="form-container">
                     <div class="form-group">
-                        <label>API地址</label>
+                        <label for="worldbook-name">书名</label>
+                        <input type="text" id="worldbook-name" placeholder="请输入世界书名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="worldbook-content">内容</label>
+                        <textarea id="worldbook-content" placeholder="请输入世界观设定、背景故事等内容..." style="min-height: 200px;"></textarea>
+                        <div class="input-hint">世界书内容会在AI对话时作为背景信息提供给AI</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API连接页面 -->
+            <div id="api-page" class="page">
+                <div class="header">
+                    <span class="back-btn" id="back-to-home-from-api">‹</span>
+                    <span class="header-title">API设置</span>
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="api-url">反代地址</label>
                         <input type="text" id="api-url" placeholder="https://api.openai.com/v1/chat/completions">
+                        <div class="input-hint">支持OpenAI、Claude、国产大模型等各种反代地址</div>
                     </div>
-                    
                     <div class="form-group">
-                        <label>API密钥</label>
-                        <input type="password" id="api-key" placeholder="请输入API密钥">
+                        <label for="api-key">API密钥</label>
+                        <input type="password" id="api-key" placeholder="sk-...">
                     </div>
-                    
                     <div class="form-group">
-                        <label>模型选择</label>
+                        <label for="model-select">选择模型</label>
                         <select id="model-select" disabled>
                             <option value="">请先获取模型列表</option>
                         </select>
-                        <button class="fetch-btn" id="fetch-models-btn">获取模型列表</button>
+                        <button class="form-button-secondary" id="fetch-models-btn" style="margin-top: 10px;">获取模型列表</button>
                     </div>
-                    
                     <div class="form-group">
-                        <label>温度设置 <span id="temperature-value">0.7</span></label>
-                        <input type="range" id="temperature-slider" min="0" max="2" step="0.1" value="0.7">
+                        <label for="temperature-slider">温度设置 <span id="temperature-value">0.7</span></label>
+                        <input type="range" id="temperature-slider" min="0" max="2" step="0.1" value="0.7" style="width: 100%;">
+                        <div class="input-hint">控制AI回复的随机性，越高越有创意</div>
                     </div>
                     
-                    <div class="api-actions">
-                        <button class="test-btn" id="test-connection">测试连接</button>
-                        <button class="save-btn" id="save-api-settings-btn">保存设置</button>
-                    </div>
+                    <button class="form-button" id="save-api-settings-btn">保存设置</button>
                     
+                    <hr style="margin: 20px 0; opacity: 0.3;">
+                    
+                    <button class="form-button-secondary" id="test-connection">测试连接</button>
                     <div id="connection-status" class="status-message"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 世界书页面 -->
-        <div id="worldbook-page" class="page">
-            <div class="header">
-                <button class="back-btn" id="back-to-home-from-worldbook">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="header-title">世界书</h1>
-                <button class="add-btn" id="add-worldbook">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-            <div class="content">
-                <!-- 世界书列表视图 -->
-                <div id="worldbook-list-view">
-                    <div id="worldbook-display-list" class="chat-list">
-                        <!-- 世界书列表将在这里动态生成 -->
-                    </div>
-                </div>
-
-                <!-- 世界书创建/编辑视图 -->
-                <div id="worldbook-create-view" style="display: none;">
-                    <div class="form-container">
-                        <div class="form-group">
-                            <label>世界书名称</label>
-                            <input type="text" id="worldbook-name" placeholder="请输入世界书名称">
+                    
+                    <!-- API配置管理 -->
+                    <hr style="margin: 20px 0; opacity: 0.3;">
+                    <div class="config-management">
+                        <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px; font-weight: 600;">
+                            💾 配置管理
+                        </h4>
+                        <div class="config-actions" style="display: flex; gap: 10px;">
+                            <button class="form-button-secondary" id="export-config-btn">导出配置</button>
+                            <button class="form-button-secondary" id="import-config-btn">导入配置</button>
+                            <button class="form-button-secondary" id="export-data-btn">导出数据</button>
+                            <button class="form-button-secondary" id="import-data-btn">导入数据</button>
                         </div>
-                        
-                        <div class="form-group">
-                            <label>分类</label>
-                            <select id="worldbook-category-select">
-                                <option value="fantasy">🧙‍♂️ 奇幻</option>
-                                <option value="scifi">🚀 科幻</option>
-                                <option value="modern">🏙️ 现代</option>
-                                <option value="historical">🏛️ 历史</option>
-                                <option value="romance">💕 言情</option>
-                                <option value="custom">✨ 自定义</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>世界书内容</label>
-                            <textarea id="worldbook-content" placeholder="请输入世界观设定、背景故事等内容"></textarea>
-                        </div>
-                        
-                        <div class="worldbook-actions">
-                            <button class="cancel-btn" id="cancel-worldbook">取消</button>
-                            <button class="save-btn" id="save-worldbook">保存</button>
-                        </div>
+                        <input type="file" id="data-file-input" accept=".json" style="display: none;">
+                        <input type="file" id="config-file-input" accept=".json" style="display: none;">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 自定义弹窗 -->
+    <!-- 模态框 -->
     <div id="custom-modal-overlay" class="modal-overlay">
         <div id="custom-modal" class="modal">
             <div class="modal-header">
-                <h3 id="modal-title">提示</h3>
+                <span id="modal-title">提示</span>
             </div>
             <div class="modal-body">
-                <p id="modal-message">这是一条消息</p>
+                <p id="modal-message"></p>
             </div>
             <div class="modal-footer">
                 <button id="modal-cancel" class="modal-btn cancel">取消</button>
