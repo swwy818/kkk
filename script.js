@@ -50,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 添加安全区适配
     addSafeAreaSupport();
+    
+    // 移动端优化
+    initMobileOptimization();
 });
 
 // 更新日期和时间
@@ -1674,6 +1677,103 @@ function preventRubberBandEffect() {
     }, { passive: false });
 }
 
+// 移动端优化
+function initMobileOptimization() {
+    // 处理iOS软键盘弹出问题
+    handleIOSKeyboard();
+    
+    // 优化触摸事件
+    optimizeTouchEvents();
+    
+    // 处理屏幕旋转
+    handleScreenRotation();
+    
+    // 优化滚动体验
+    optimizeScrolling();
+}
+
+// 处理iOS软键盘弹出问题
+function handleIOSKeyboard() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+        const messageInput = document.getElementById('message-input');
+        const chatMessages = document.getElementById('chat-messages');
+        
+        // 软键盘弹出时
+        messageInput.addEventListener('focus', () => {
+            // 延迟执行以确保键盘完全弹出
+            setTimeout(() => {
+                // 滚动到底部
+                scrollChatToBottom();
+                
+                // 添加额外的底部padding以确保内容不被键盘遮挡
+                chatMessages.style.paddingBottom = '250px';
+            }, 300);
+        });
+        
+        // 软键盘收起时
+        messageInput.addEventListener('blur', () => {
+            // 恢复正常padding
+            setTimeout(() => {
+                chatMessages.style.paddingBottom = '15px';
+                scrollChatToBottom();
+            }, 100);
+        });
+    }
+}
+
+// 优化触摸事件
+function optimizeTouchEvents() {
+    // 为所有按钮添加触摸反馈
+    const buttons = document.querySelectorAll('button, .nav-item, .back-btn, .add-btn, .save-btn, .more-btn, .emoji-item');
+    
+    buttons.forEach(button => {
+        button.addEventListener('touchstart', function() {
+            this.style.opacity = '0.7';
+        });
+        
+        button.addEventListener('touchend', function() {
+            this.style.opacity = '1';
+        });
+        
+        button.addEventListener('touchcancel', function() {
+            this.style.opacity = '1';
+        });
+    });
+    
+    // 优化长列表的触摸滚动
+    const scrollContainers = document.querySelectorAll('.chat-messages, .list-container, .form-container');
+    
+    scrollContainers.forEach(container => {
+        container.style.webkitOverflowScrolling = 'touch';
+    });
+}
+
+// 处理屏幕旋转
+function handleScreenRotation() {
+    window.addEventListener('resize', () => {
+        // 重新计算聊天消息区域高度
+        if (document.getElementById('chat-page').classList.contains('active')) {
+            scrollChatToBottom();
+        }
+    });
+}
+
+// 优化滚动体验
+function optimizeScrolling() {
+    // 防止滚动穿透
+    const modalOverlay = document.getElementById('custom-modal-overlay');
+    
+    modalOverlay.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+    }, { passive: false });
+    
+    // 优化表情面板滚动
+    const emojiPanel = document.getElementById('emoji-panel');
+    emojiPanel.style.webkitOverflowScrolling = 'touch';
+}
+
 // 添加安全区适配
 function addSafeAreaSupport() {
     // 添加viewport-fit=cover元标签
@@ -1683,5 +1783,15 @@ function addSafeAreaSupport() {
         if (!content.includes('viewport-fit=cover')) {
             metaViewport.setAttribute('content', content + ', viewport-fit=cover');
         }
+    }
+    
+    // 检测是否为iOS设备
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+        // 添加iOS特定的安全区适配
+        document.documentElement.style.setProperty('--safe-area-inset-top', 'env(safe-area-inset-top)');
+        document.documentElement.style.setProperty('--safe-area-inset-right', 'env(safe-area-inset-right)');
+        document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom)');
+        document.documentElement.style.setProperty('--safe-area-inset-left', 'env(safe-area-inset-left)');
     }
 }
