@@ -590,7 +590,7 @@ body {
         margin-bottom: 70px;
     }
     
-    .chat-input-area {
+    #chat-page .chat-input-area {
         position: fixed;
         bottom: 0;
         left: 0;
