@@ -353,6 +353,16 @@ body {
     gap: 10px;
     max-height: calc(100vh - 200px);
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* 平滑滚动 */
+    overscroll-behavior: contain; /* 防止过度滚动 */
+}
+
+/* 优化iOS滚动体验 */
+@media (pointer: coarse) {
+    .chat-messages, .list-container, .form-container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -501,10 +511,13 @@ body {
     padding: 10px 15px;
     border: 1px solid var(--border-color);
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 16px; /* 防止iOS缩放 */
     outline: none;
     background: var(--primary-bg);
     min-width: 0;
+    -webkit-appearance: none; /* 移除iOS默认样式 */
+    -moz-appearance: none;
+    appearance: none;
 }
 
 #message-input:focus {
@@ -515,11 +528,16 @@ body {
     padding: 8px 12px;
     border: none;
     border-radius: 18px;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
     flex-shrink: 0;
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .wait-btn {
@@ -542,12 +560,43 @@ body {
     justify-content: center;
 }
 
+/* 移动端按钮优化 */
+@media (max-width: 768px) {
+    .wait-btn, .send-btn, .regenerate-btn {
+        padding: 10px 14px;
+        font-size: 15px;
+    }
+    
+    .chat-input-area {
+        padding: 8px 10px;
+    }
+    
+    #message-input {
+        padding: 12px 15px;
+    }
+}
+
 .wait-btn:hover, .send-btn:hover, .regenerate-btn:hover {
     transform: scale(1.05);
 }
 
 .regenerate-btn:hover {
     background: #e6850e;
+}
+
+/* 移动端输入区域固定在底部 */
+@media (max-width: 768px) {
+    #chat-page .chat-messages {
+        margin-bottom: 70px;
+    }
+    
+    .chat-input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
 }
 
 /* 底部导航 */
@@ -558,16 +607,23 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
     padding: 5px;
     transition: color 0.2s ease;
     color: var(--text-secondary);
+    min-height: 44px;
+    min-width: 44px;
+    flex: 1;
 }
 
 .nav-item.active {
@@ -583,11 +639,34 @@ body {
     font-size: 10px;
 }
 
+/* 移动端底部导航优化 */
+@media (max-width: 768px) {
+    .bottom-nav {
+        height: 65px;
+    }
+    
+    .nav-item i {
+        font-size: 22px;
+    }
+    
+    .nav-item span {
+        font-size: 11px;
+    }
+}
+
+/* 小屏幕设备底部导航优化 */
+@media (max-width: 320px) {
+    .nav-item span {
+        font-size: 9px;
+    }
+}
+
 /* 表单样式 */
 .form-container {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .form-group {
@@ -609,10 +688,13 @@ body {
     padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px; /* 防止iOS缩放 */
     background: var(--secondary-bg);
     color: var(--text-primary);
     outline: none;
+    -webkit-appearance: none; /* 移除iOS默认样式 */
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .form-group input:focus,
@@ -624,6 +706,20 @@ body {
 .form-group textarea {
     min-height: 100px;
     resize: vertical;
+}
+
+/* 优化移动端表单元素点击区域 */
+@media (pointer: coarse) {
+    .form-group label {
+        padding: 5px 0;
+    }
+    
+    .form-button, 
+    .form-button-secondary, 
+    .form-button-danger,
+    .modal-btn {
+        min-height: 44px;
+    }
 }
 
 .form-button {
@@ -722,6 +818,8 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .modal-overlay.visible {
@@ -732,6 +830,7 @@ body {
     background: var(--secondary-bg);
     border-radius: 12px;
     width: 280px;
+    max-width: 90%;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 }
@@ -750,6 +849,7 @@ body {
     text-align: center;
     color: var(--text-primary);
     line-height: 1.5;
+    font-size: 16px;
 }
 
 .modal-footer {
@@ -765,6 +865,7 @@ body {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    min-height: 50px;
 }
 
 .modal-btn.cancel {
@@ -779,6 +880,19 @@ body {
 
 .modal-btn:hover {
     background: #f5f5f5;
+}
+
+/* 移动端模态框优化 */
+@media (max-width: 768px) {
+    .modal {
+        width: 90%;
+        max-width: 320px;
+    }
+    
+    .modal-btn {
+        min-height: 54px;
+        font-size: 17px;
+    }
 }
 
 /* 空状态 */
@@ -813,6 +927,7 @@ body {
         user-select: none;
         -webkit-touch-callout: none;
         -webkit-tap-highlight-color: transparent;
+        position: fixed; /* 防止iOS橡皮筋效果 */
     }
     
     #phone-container {
@@ -843,6 +958,7 @@ body {
         -moz-user-select: text;
         -ms-user-select: text;
         user-select: text;
+        font-size: 16px !important; /* 防止iOS缩放 */
     }
     
     /* 按钮和可点击元素优化 */
@@ -856,6 +972,67 @@ body {
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    
+    /* 优化表情面板在移动端的显示 */
+    .emoji-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .emoji-item {
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+    }
+    
+    /* 优化输入区域在移动端的显示 */
+    .chat-input-area {
+        padding: 8px;
+    }
+    
+    /* 优化聊天消息在移动端的显示 */
+    .message-bubble {
+        max-width: 90%;
+    }
+    
+    /* 优化表单在移动端的显示 */
+    .form-container {
+        padding: 15px;
+        -webkit-overflow-scrolling: touch; /* 平滑滚动 */
+    }
+    
+    /* 优化底部导航在移动端的显示 */
+    .bottom-nav {
+        height: 65px;
+    }
+    
+    .nav-item i {
+        font-size: 22px;
+    }
+    
+    /* 优化模态框在移动端的显示 */
+    .modal {
+        width: 90%;
+        max-width: 320px;
+    }
+    
+    /* 优化首页在移动端的显示 */
+    .home-header {
+        margin-bottom: 30px;
+    }
+    
+    .current-time {
+        font-size: 42px;
+    }
+    
+    /* 优化滚动条在移动端的显示 */
+    ::-webkit-scrollbar {
+        width: 2px;
+    }
+    
+    /* 所有可滚动容器添加弹性滚动 */
+    .page, .list-container, .form-container, .chat-messages {
+        -webkit-overflow-scrolling: touch;
     }
 }
 
@@ -1265,6 +1442,11 @@ hr {
     white-space: nowrap;
     flex-shrink: 0;
     margin-right: 8px;
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .emoji-btn:hover {
@@ -1279,6 +1461,7 @@ hr {
     padding: 15px;
     max-height: 200px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .emoji-grid {
@@ -1301,6 +1484,38 @@ hr {
 
 .emoji-item:hover {
     background: var(--primary-bg);
+}
+
+/* 移动端表情包面板优化 */
+@media (max-width: 768px) {
+    .emoji-panel {
+        padding: 10px;
+        max-height: 180px;
+    }
+    
+    .emoji-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+    }
+    
+    .emoji-item {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+    }
+}
+
+/* 小屏幕设备表情包面板优化 */
+@media (max-width: 320px) {
+    .emoji-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 4px;
+    }
+    
+    .emoji-item {
+        width: 36px;
+        height: 36px;
+    }
 }
 
 /* 壁纸预览样式 */
@@ -1483,10 +1698,44 @@ hr {
     
     .bottom-nav {
         padding-bottom: max(0px, env(safe-area-inset-bottom));
+        height: calc(60px + env(safe-area-inset-bottom));
     }
     
     .chat-input-area {
         padding-bottom: max(10px, calc(10px + env(safe-area-inset-bottom)));
+    }
+    
+    #status-bar {
+        padding-top: max(0px, env(safe-area-inset-top));
+        height: calc(24px + env(safe-area-inset-top));
+    }
+    
+    .header {
+        padding-top: max(0px, env(safe-area-inset-top));
+        height: calc(50px + env(safe-area-inset-top));
+    }
+    
+    /* 修复iOS底部安全区域问题 */
+    .chat-messages {
+        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+    
+    /* 修复iOS顶部安全区域问题 */
+    .page {
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    /* 修复iOS横屏模式下的安全区域问题 */
+    @media (orientation: landscape) {
+        #phone-screen {
+            padding-left: max(0px, env(safe-area-inset-left));
+            padding-right: max(0px, env(safe-area-inset-right));
+        }
+        
+        .chat-input-area {
+            padding-left: max(15px, env(safe-area-inset-left));
+            padding-right: max(15px, env(safe-area-inset-right));
+        }
     }
 }
 
@@ -1550,6 +1799,15 @@ hr {
     
     .icon-image i {
         font-size: 28px;
+    }
+    
+    .form-section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
     }
 }
 
@@ -1619,6 +1877,43 @@ hr {
     
     .current-date {
         font-size: 14px;
+    }
+    
+    /* 横屏模式下优化聊天界面 */
+    #chat-page .chat-messages {
+        margin-bottom: 60px;
+    }
+    
+    .chat-input-area {
+        min-height: 50px;
+    }
+    
+    .bottom-nav {
+        height: 50px;
+    }
+    
+    /* 横屏模式下优化表单 */
+    .form-container {
+        padding: 10px;
+    }
+    
+    .form-section {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 10px;
+    }
+    
+    /* 横屏模式下优化头像上传区域 */
+    .avatar-upload-section {
+        margin-bottom: 15px;
+    }
+    
+    .avatar-placeholder {
+        width: 60px;
+        height: 60px;
     }
 }
 
