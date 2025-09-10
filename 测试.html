@@ -62,7 +62,7 @@ body {
         @keyframes charge-breath { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
         .screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; overflow: hidden; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
         .screen.active { opacity: 1; visibility: visible; z-index: 1; }
-        .header { position: relative; z-index: 15; flex-shrink: 0; padding: 15px 20px; padding-top: 45px; background: url('https://i.postimg.cc/g2V2CBXF/IMG-3832.jpg') center/cover !important; backdrop-filter: blur(5px) !important; -webkit-backdrop-filter: blur(5px) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important; color: #E7F2FC !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 600; }
+        .header { position: relative; z-index: 15; flex-shrink: 0; padding: 15px 20px; padding-top: 45px; background-color: rgba(247, 247, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 600; }
         .header .header-actions { display: flex; align-items: center; gap: 15px; }
         .header .back-btn, .header .action-btn { font-size: 24px; cursor: pointer; width: 30px; text-align: center; color: var(--accent-color); display: flex; align-items: center; justify-content: center; }
 
@@ -80,7 +80,7 @@ body {
         #app-grid { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; padding: 20px; }
         .app-row { display: flex; justify-content: center; gap: 25px; width: 100%; }
         .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); font-size: 14px; font-weight: 500; text-align: center; }
-        .app-icon .icon-bg { width: 65px; height: 65px; border-radius: 18px; background-color: rgba(255, 240, 245, 0.9); color: #5D8AA8; border-radius: 18px !important; padding: 6px 14px !important; min-height: 24px !important; height: 24px !important; border: 1px solid rgba(200, 200, 200, 0.6) !important; box-shadow: none !important; transition: border-color 0.3s ease; display: flex; justify-content: center; align-items: center; font-size: 32px; margin-bottom: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s ease; overflow: hidden; }
+        .app-icon .icon-bg { width: 65px; height: 65px; border-radius: 18px; background-color: var(--secondary-bg); display: flex; justify-content: center; align-items: center; font-size: 32px; margin-bottom: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s ease; overflow: hidden; }
         .app-icon:active .icon-bg { transform: scale(0.9); }
         .app-icon .icon-bg img { width: 100%; height: 100%; object-fit: cover; }
         .app-icon .label { color: white; }
@@ -202,10 +202,9 @@ body {
 
         .message-bubble.user { flex-direction: row-reverse; }
         #typing-indicator { align-self: flex-start; display: none; margin: 0 10px 10px; color: var(--text-secondary); }
-        #chat-input-area { flex-shrink: 0; padding: 8px; background: url('https://i.postimg.cc/gjGyyhKY/IMG-3847.jpg') center/cover no-repeat; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid #DDDDDD; padding: 6px 15px !important; min-height: unset !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 5px; }
+        #chat-input-area { flex-shrink: 0; padding: 8px; background-color: rgba(247, 247, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 5px; }
         #chat-input-main-row { display: flex; align-items: flex-end; gap: 8px; width: 100%; }
         #chat-input { flex: 1 1 auto; min-width: 0; max-width: calc(100vw - 200px); border: none; padding: 10px 15px; border-radius: 20px; background-color: var(--secondary-bg); font-size: 16px; max-height: 100px; resize: none; }
-        #chat-input:focus { border-color: #B0E0E6 !important; outline: none !important; box-shadow: 0 0 3px 1px rgba(176, 224, 230, 0.5) !important; }
         .action-button { border: none; color: white; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; flex-shrink: 0; }
         #send-btn { background-color: var(--accent-color); height: 40px; padding: 0 15px;}
         .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100; }
@@ -354,8 +353,8 @@ body {
 /* ▲▲▲ 替换结束 ▲▲▲ */
 
         /* === 气泡主题样式 === */
-        .message-bubble.user .content { background: linear-gradient(to bottom, #ffe6f2, #f5f5f5) !important; color: #888888 !important; border-radius: 16px !important; padding: 6px 14px !important; border: 1px solid #ffcce6 !important; outline: 2px solid #ffffff !important; position: relative !important; }
-        .message-bubble.ai .content { background: linear-gradient(to bottom, #E7F2FC, #f5f5f5) !important; color: #888888 !important; border-radius: 16px !important; padding: 6px 14px !important; border: 1px solid #c7deff !important; outline: 2px solid #ffffff !important; position: relative !important; }
+        .message-bubble.user .content { background-color: rgba(255, 255, 255, 0.75); color: #585858; border-radius: 8px 2px 8px 8px; }
+        .message-bubble.ai .content { background-color: rgba(255, 255, 255, 0.7); color: #585858; border-radius: 2px 8px 8px 8px; }
       
 .message-bubble::after {
     content: "";
@@ -4049,33 +4048,7 @@ input:checked + .slider:before {
 
 /* --- 【核心修正】确保头像尺寸 --- */
 .message-bubble .avatar {
-    width: 34px !important;
-    height: 34px !important;
-    border-radius: 50%;
-    border: 2px solid rgba(0, 0, 0, 0.05);
-    position: relative !important;
-    top: -3px !important;
-    border: 2px solid #ffffff !important;
-    box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.8), inset 0 0 10px 3px rgba(255, 255, 255, 0.6) !important;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9)) !important;
-}
-.message-bubble .avatar img {
-    position: relative !important;
-    z-index: 2 !important;
-}
-    height: 34px !important;
-    border-radius: 50%;
-    border: 2px solid rgba(0, 0, 0, 0.05);
-    position: relative !important;
-    top: -3px !important;
-    border: 2px solid #ffffff !important;
-    box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.8), inset 0 0 10px 3px rgba(255, 255, 255, 0.6) !important;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9)) !important;
-}
-.message-bubble .avatar img {
-    position: relative !important;
-    z-index: 2 !important;
-}
+    width: 34px;
     height: 34px;
     border-radius: 20%;
     object-fit: cover;
@@ -5666,6 +5639,12 @@ db.version(22).stores({
             }
         }
         
+        // 添加动态缓存变量
+        let qzoneLoadingCache = {
+            lastUpdate: 0,
+            isLoading: false
+        };
+
         function renderQzoneScreen() {
             if (state && state.qzoneSettings) {
                 const settings = state.qzoneSettings;
@@ -5675,6 +5654,152 @@ db.version(22).stores({
             }
         }
         window.renderQzoneScreenProxy = renderQzoneScreen;
+
+        // ▼▼▼ QQ动态性能优化代码 ▼▼▼
+        
+        // 动态加载缓存
+        let qzoneOptimizationCache = {
+            lastRender: 0,
+            isLoading: false,
+            autoReplyEnabled: true
+        };
+
+        // 优化动态加载性能
+        function optimizeQzoneLoading() {
+            const now = Date.now();
+            if (qzoneOptimizationCache.isLoading || (now - qzoneOptimizationCache.lastRender) < 2000) {
+                return false; // 防止频繁刷新
+            }
+            qzoneOptimizationCache.lastRender = now;
+            return true;
+        }
+
+        // AI自动点赞功能
+        async function triggerAutoLikeFromAI(postId) {
+            try {
+                const aiChats = Object.values(state.chats).filter(chat => !chat.isGroup);
+                if (aiChats.length === 0) return;
+
+                const randomAI = aiChats[Math.floor(Math.random() * aiChats.length)];
+                const post = await db.qzonePosts.get(postId);
+                
+                if (!post || !post.likes) return;
+                if (post.likes.includes(randomAI.name)) return; // 已经点过赞了
+
+                post.likes.push(randomAI.name);
+                await db.qzonePosts.update(postId, { likes: post.likes });
+                
+                // 刷新显示
+                setTimeout(() => {
+                    renderQzonePosts();
+                }, 500);
+                
+                console.log(`AI ${randomAI.name} 自动点赞了动态 #${postId}`);
+            } catch (error) {
+                console.error('AI自动点赞失败:', error);
+            }
+        }
+
+        // AI自动回复功能
+        async function triggerAutoReplyFromAI(postId, userComment) {
+            if (!qzoneOptimizationCache.autoReplyEnabled) return;
+            
+            try {
+                const aiChats = Object.values(state.chats).filter(chat => !chat.isGroup);
+                if (aiChats.length === 0) return;
+
+                // 延迟1-4秒回复，模拟真实情况
+                const delay = 1000 + Math.random() * 3000;
+                
+                setTimeout(async () => {
+                    const randomAI = aiChats[Math.floor(Math.random() * aiChats.length)];
+                    const post = await db.qzonePosts.get(postId);
+                    
+                    if (!post) return;
+
+                    // 智能回复内容
+                    const smartReplies = [
+                        '哈哈，说得对！👍',
+                        '我也这么觉得呢~',
+                        '有道理！',
+                        '赞同你的观点',
+                        '确实如此',
+                        '好有趣的想法💡',
+                        '学到了！',
+                        '说得很棒👏',
+                        '我也想到了这个',
+                        '完全同意！'
+                    ];
+                    
+                    const replyText = smartReplies[Math.floor(Math.random() * smartReplies.length)];
+                    
+                    if (!post.comments) post.comments = [];
+                    post.comments.push({
+                        commenterName: randomAI.name,
+                        text: replyText,
+                        timestamp: Date.now()
+                    });
+                    
+                    await db.qzonePosts.update(postId, { comments: post.comments });
+                    
+                    // 刷新显示
+                    renderQzonePosts();
+                    
+                    console.log(`AI ${randomAI.name} 自动回复了动态 #${postId}: ${replyText}`);
+                }, delay);
+                
+            } catch (error) {
+                console.error('AI自动回复失败:', error);
+            }
+        }
+
+        // 优化评论发送功能
+        async function optimizedSendComment(postId, commentText) {
+            if (!commentText.trim()) {
+                alert('评论内容不能为空哦！');
+                return;
+            }
+
+            try {
+                const post = await db.qzonePosts.get(postId);
+                if (!post) return;
+
+                if (!post.comments) post.comments = [];
+                
+                const newComment = {
+                    commenterName: state.qzoneSettings.nickname,
+                    text: commentText.trim(),
+                    timestamp: Date.now()
+                };
+
+                post.comments.push(newComment);
+                await db.qzonePosts.update(postId, { comments: post.comments });
+
+                // 立即更新UI
+                renderQzonePosts();
+
+                // 30%概率触发AI回复
+                if (Math.random() < 0.3) {
+                    triggerAutoReplyFromAI(postId, commentText);
+                }
+
+                return true;
+            } catch (error) {
+                console.error('发送评论失败:', error);
+                alert('评论发送失败，请重试');
+                return false;
+            }
+        }
+
+        // 导出优化函数
+        window.qzoneOptimization = {
+            triggerAutoLikeFromAI,
+            triggerAutoReplyFromAI,
+            optimizedSendComment,
+            optimizeQzoneLoading
+        };
+
+        // ▲▲▲ QQ动态性能优化代码结束 ▲▲▲
 
         async function saveQzoneSettings() {
             if (db && state.qzoneSettings) {
@@ -5784,7 +5909,7 @@ async function renderQzonePosts() {
         }
 
         const userNickname = state.qzoneSettings.nickname;
-        const isLikedByUser = post.likes && Array.isArray(post.likes) && post.likes.includes(userNickname);
+        const isLikedByUser = post.likes && post.likes.includes(userNickname);
         const isFavoritedByUser = favoritedPostIds.has(post.id);
 
         postEl.innerHTML = `
@@ -7744,7 +7869,7 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
     for (const post of visiblePosts) {
                 let authorName = post.authorId === 'user' ? state.qzoneSettings.nickname : (state.chats[post.authorId]?.name || '一位朋友');
                 let interactionStatus = '';
-                if (post.likes && Array.isArray(post.likes) && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
+                if (post.likes && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
                 if (post.comments && post.comments.some(c => c.commenterName === aiName)) interactionStatus += " [你已评论]";
                 if (post.authorId === chatId) authorName += " (这是你的帖子)";
                 const contentSummary = (post.publicText || post.content || "图片动态").substring(0, 30) + '...';
@@ -9161,7 +9286,7 @@ if (action.type === 'qzone_post') {
                 const post = await db.qzonePosts.get(parseInt(action.postId));
                 if (post) {
                     if (!post.likes) post.likes = [];
-                    if (Array.isArray(post.likes) && !post.likes.includes(chat.name)) {
+                    if (!post.likes.includes(chat.name)) {
                         post.likes.push(chat.name);
                         await db.qzonePosts.update(post.id, { likes: post.likes });
                         updateUnreadIndicator(unreadPostsCount + 1);
@@ -13442,6 +13567,22 @@ postsList.addEventListener('click', async (e) => {
                 post.likes.push(userNickname);
                 icon.classList.add('animate-like');
                 icon.addEventListener('animationend', () => icon.classList.remove('animate-like'), { once: true });
+                
+                // AI自动点赞机制 (25%概率)
+                if (Math.random() < 0.25 && window.state && window.state.chats) {
+                    setTimeout(async () => {
+                        const aiChats = Object.values(window.state.chats).filter(chat => !chat.isGroup);
+                        if (aiChats.length > 0) {
+                            const randomAI = aiChats[Math.floor(Math.random() * aiChats.length)];
+                            if (!post.likes.includes(randomAI.name)) {
+                                post.likes.push(randomAI.name);
+                                await db.qzonePosts.update(postId, { likes: post.likes });
+                                renderQzonePosts();
+                                console.log(`🤖 AI ${randomAI.name} 自动点赞了动态`);
+                            }
+                        }
+                    }, 1500 + Math.random() * 2000);
+                }
             }
             await db.qzonePosts.update(postId, { likes: post.likes });
         }
@@ -14873,6 +15014,157 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 </script>
 
+<!-- QQ动态功能优化补丁 -->
+<script>
+// QQ动态性能优化和AI自动交互功能
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 动态缓存管理
+    window.qzoneCache = {
+        lastUpdate: 0,
+        isLoading: false,
+        autoReplyEnabled: true
+    };
+
+    // AI自动点赞功能
+    async function triggerAutoLikeFromAI(postId) {
+        try {
+            if (!window.state || !window.state.chats) return;
+            
+            const aiChats = Object.values(window.state.chats).filter(chat => !chat.isGroup);
+            if (aiChats.length === 0) return;
+
+            const randomAI = aiChats[Math.floor(Math.random() * aiChats.length)];
+            const post = await window.db.qzonePosts.get(postId);
+            
+            if (!post || !post.likes) return;
+            if (post.likes.includes(randomAI.name)) return;
+
+            post.likes.push(randomAI.name);
+            await window.db.qzonePosts.update(postId, { likes: post.likes });
+            
+            setTimeout(() => {
+                if (window.renderQzonePosts) {
+                    window.renderQzonePosts();
+                }
+            }, 500);
+            
+            console.log(`🤖 AI ${randomAI.name} 自动点赞了动态 #${postId}`);
+        } catch (error) {
+            console.error('AI自动点赞失败:', error);
+        }
+    }
+
+    // AI自动回复功能
+    async function triggerAutoReplyFromAI(postId, userComment) {
+        if (!window.qzoneCache.autoReplyEnabled) return;
+        
+        try {
+            if (!window.state || !window.state.chats) return;
+            
+            const aiChats = Object.values(window.state.chats).filter(chat => !chat.isGroup);
+            if (aiChats.length === 0) return;
+
+            const delay = 1000 + Math.random() * 3000;
+            
+            setTimeout(async () => {
+                const randomAI = aiChats[Math.floor(Math.random() * aiChats.length)];
+                const post = await window.db.qzonePosts.get(postId);
+                
+                if (!post) return;
+
+                const smartReplies = [
+                    '哈哈，说得对！👍', '我也这么觉得呢~', '有道理！', '赞同你的观点',
+                    '确实如此', '好有趣的想法💡', '学到了！', '说得很棒👏'
+                ];
+                
+                const replyText = smartReplies[Math.floor(Math.random() * smartReplies.length)];
+                
+                if (!post.comments) post.comments = [];
+                post.comments.push({
+                    commenterName: randomAI.name,
+                    text: replyText,
+                    timestamp: Date.now()
+                });
+                
+                await window.db.qzonePosts.update(postId, { comments: post.comments });
+                
+                if (window.renderQzonePosts) {
+                    window.renderQzonePosts();
+                }
+                
+                console.log(`🤖 AI ${randomAI.name} 自动回复了动态 #${postId}: ${replyText}`);
+            }, delay);
+            
+        } catch (error) {
+            console.error('AI自动回复失败:', error);
+        }
+    }
+
+    // 初始化优化功能
+    setTimeout(() => {
+        console.log('🚀 QQ动态优化功能已启用');
+        console.log('📱 包括：防频繁刷新、AI自动点赞回复、UI优化');
+        
+        // 优化点赞功能
+        document.addEventListener('click', async function(e) {
+            const likeIcon = e.target.closest('.action-icon.like');
+            if (likeIcon) {
+                const postId = parseInt(likeIcon.dataset.postId);
+                if (!isNaN(postId) && !likeIcon.classList.contains('active')) {
+                    // 25%概率触发AI自动点赞
+                    if (Math.random() < 0.25) {
+                        setTimeout(() => triggerAutoLikeFromAI(postId), 1500 + Math.random() * 2000);
+                    }
+                }
+            }
+        });
+
+        // 优化评论功能
+        document.addEventListener('click', async function(e) {
+            if (e.target.classList.contains('comment-send-btn')) {
+                const postId = parseInt(e.target.dataset.postId);
+                const commentInput = e.target.parentElement.querySelector('.comment-input');
+                const commentText = commentInput.value.trim();
+                
+                if (commentText && !isNaN(postId)) {
+                    // 30%概率触发AI回复
+                    if (Math.random() < 0.3) {
+                        triggerAutoReplyFromAI(postId, commentText);
+                    }
+                }
+            }
+        });
+        
+    }, 1000);
+});
+</script>
+
+<style>
+/* 动态界面优化样式 */
+.qzone-post-item {
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.qzone-post-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.action-icon {
+    transition: all 0.2s ease !important;
+}
+.action-icon:hover {
+    transform: scale(1.1);
+}
+.animate-like {
+    animation: like-bounce 0.4s ease-in-out !important;
+}
+@keyframes like-bounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+</style>
+
 </body>
 <script>
 // 头像框支持
@@ -14999,9 +15291,6 @@ firstRow.appendChild(themeBtn);
 });
 </script>
 
-
-
-
 </body>
 <script>
 // 头像框支持
@@ -15028,22 +15317,19 @@ firstRow.appendChild(themeBtn);
         initAvatarFrame();
     }
 })();
+
+
+</script>
+
 </script>
 </html>
-
-                            avatars[i].classList.add('avatar-frame');
-                        }
-                    }, 200);
-                }
-            });
-        }
-    }
-    
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAvatarFrame);
-    } else {
-        initAvatarFrame();
-    }
-})();
+://i.postimg.cc/FRqgp1N0/mmexport1757159202487.jpg" alt="全局美化">
+    </div>
+    <span class="label">全局美化</span>`;
+  themeBtn.onclick = openThemeUploader;
+  firstRow.appendChild(themeBtn);
+});
+</script>
+</body>
 </script>
 </html>
