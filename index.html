@@ -7893,13 +7893,19 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
 if (!response.ok) {
     let errorMsg = `API Error: ${response.status}`;
     try {
-        // 尝试解析错误信息体为JSON
-        const errorData = await response.json();
-        // 安全地获取错误信息，如果结构不符合预期，就将整个错误对象转为字符串
-        errorMsg += ` - ${errorData?.error?.message || JSON.stringify(errorData)}`;
+        // 【修复】先读取响应文本，然后尝试解析JSON
+        const responseText = await response.text();
+        try {
+            const errorData = JSON.parse(responseText);
+            // 安全地获取错误信息，如果结构不符合预期，就将整个错误对象转为字符串
+            errorMsg += ` - ${errorData?.error?.message || JSON.stringify(errorData)}`;
+        } catch (parseError) {
+            // 如果不是JSON格式，直接使用文本内容
+            errorMsg += ` - ${responseText}`;
+        }
     } catch (jsonError) {
-        // 如果连JSON都不是，就直接读取文本
-        errorMsg += ` - ${await response.text()}`;
+        // 如果读取响应失败，使用通用错误信息
+        errorMsg += ` - 无法读取错误详情`;
     }
     // 抛出一个包含了详细信息的错误，这样就不会在catch块里再次出错了
     throw new Error(errorMsg);
