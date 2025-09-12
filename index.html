@@ -7426,7 +7426,13 @@ ${contextSummary || "（无有效对话记录）"}
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API失败: ${(await response.json()).error.message}`);
+                    const errorText = await response.text();
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        throw new Error(`API失败: ${errorData.error.message}`);
+                    } catch (parseError) {
+                        throw new Error(`API失败: ${errorText}`);
+                    }
                 }
                 const data = await response.json();
                 
@@ -9242,8 +9248,13 @@ try {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`API请求失败: ${response.status} - ${JSON.stringify(errorData)}`);
+            const errorText = await response.text();
+            try {
+                const errorData = JSON.parse(errorText);
+                throw new Error(`API请求失败: ${response.status} - ${JSON.stringify(errorData)}`);
+            } catch (parseError) {
+                throw new Error(`API请求失败: ${response.status} - ${errorText}`);
+            }
         }
         const data = await response.json();
         // 检查是否有有效回复
@@ -10731,7 +10742,15 @@ ${videoCallState.preCallContext}
                 model: model, messages: messagesForApi, temperature: 0.8
             })
         });
-        if (!response.ok) throw new Error((await response.json()).error.message);
+        if (!response.ok) {
+            const errorText = await response.text();
+            try {
+                const errorData = JSON.parse(errorText);
+                throw new Error(errorData.error.message);
+            } catch (parseError) {
+                throw new Error(errorText);
+            }
+        }
         
         const data = await response.json();
         const aiResponse = data.choices[0].message.content;
@@ -11116,8 +11135,13 @@ ${contextSummary}
             })
         });
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`API 请求失败: ${response.status} - ${errorData.error.message}`);
+            const errorText = await response.text();
+            try {
+                const errorData = JSON.parse(errorText);
+                throw new Error(`API 请求失败: ${response.status} - ${errorData.error.message}`);
+            } catch (parseError) {
+                throw new Error(`API 请求失败: ${response.status} - ${errorText}`);
+            }
         }
         
         const data = await response.json();
