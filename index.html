@@ -5691,7 +5691,7 @@ db.version(22).stores({
                 const post = await db.qzonePosts.get(postId);
                 
                 if (!post || !post.likes) return;
-                if (post.likes.includes(randomAI.name)) return; // 已经点过赞了
+                if (post.likes && Array.isArray(post.likes) && post.likes.includes(randomAI.name)) return; // 已经点过赞了
 
                 post.likes.push(randomAI.name);
                 await db.qzonePosts.update(postId, { likes: post.likes });
@@ -5788,6 +5788,63 @@ db.version(22).stores({
                 // 30%概率触发AI回复
                 if (Math.random() < 0.3) {
                     triggerAutoReplyFromAI(postId, commentText);
+
+// === 用户评论AI角色动态后，AI角色主动回复 ===
+setTimeout(async () => {
+    try {
+        const post = await db.qzonePosts.get(postId);
+        if (post && post.authorName && post.authorName !== '用户' && post.authorName !== state.qzoneSettings.nickname) {
+            // 这是AI角色的动态，用户评论了，AI需要回复
+            const authorChat = await db.chats.where('name').equals(post.authorName).first();
+            if (authorChat && !authorChat.isGroup) {
+                const recentMessages = await db.messages.where('chatId').equals(authorChat.id).reverse().limit(10).toArray();
+                const recentContext = recentMessages.map(m => `${m.sender}: ${m.content}`).join('\n');
+                
+                const replyPrompt = `
+你是${post.authorName}。用户在你的动态"${post.content || post.publicText || post.imageDescription || '(图片动态)'}"下评论了："${commentText}"
+请根据你的人设、世界书信息、动态内容和你们最近的聊天内容，对用户的评论进行回应。
+最近聊天内容：${recentContext}
+请直接回复内容，不要包含其他格式。`;
+
+              const response = await fetch('/v1/chat/completions', {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.globalSettings.apiKey}`
+    },
+    body: JSON.stringify({
+        model: state.globalSettings.model,
+        messages: [{ role: 'user', content: replyPrompt }],
+        max_tokens: 100
+    })
+});
+
+                
+                const data = await response.json();
+                if (data.choices?.[0]?.message?.content) {
+                    const replyText = data.choices[0].message.content.trim();
+                    
+                    if (!post.comments) post.comments = [];
+                    post.comments.push({
+                        commenterName: post.authorName,
+                        commentText: `@用户 ${replyText}`,
+                        timestamp: Date.now()
+                    });
+                    await db.qzonePosts.put(post);
+                    console.log(`${post.authorName} 回复了用户对其动态的评论: ${replyText}`);
+                    
+                    // 刷新动态显示
+                    if (document.getElementById('qzone-screen').classList.contains('active')) {
+                        await renderQzonePosts();
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('AI动态作者自动回复出错:', error);
+    }
+}, Math.random() * 4000 + 3000); // 3-7秒延迟
+
                 }
 
                 return true;
@@ -7426,13 +7483,7 @@ ${contextSummary || "（无有效对话记录）"}
                 });
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    try {
-                        const errorData = JSON.parse(errorText);
-                        throw new Error(`API失败: ${errorData.error.message}`);
-                    } catch (parseError) {
-                        throw new Error(`API失败: ${errorText}`);
-                    }
+                    throw new Error(`API失败: ${(await response.json()).error.message}`);
                 }
                 const data = await response.json();
                 
@@ -7659,9 +7710,7 @@ messagesPayload = historySlice.map(msg => {
     // 处理特殊消息类型，并将前缀应用进去
     let content;
     if (msg.type === 'user_photo') content = `[${sender} 发送了一张图片，内容是：'${msg.content}']`;
-    else if (msg.type === 'ai_image') {bubble.classList.add('is-ai-image'); const altText = "AI生成的图片";
-    // 在图片下方添加描述
-    contentHtml = `<div class="image-description">${msg.content}</div> `;}
+    else if (msg.type === 'ai_image') content = `[${sender} 发送了一张AI生成的图片，内容是：'${msg.content}']`;
     else if (msg.type === 'voice_message') content = `[${sender} 发送了一条语音，内容是：'${msg.content}']`;
     else if (msg.type === 'transfer') content = `[${msg.senderName} 向 ${msg.receiverName} 转账 ${msg.amount}元, 备注: ${msg.note}]`;
     else if (msg.type === 'waimai_request') {
@@ -7899,19 +7948,13 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
 if (!response.ok) {
     let errorMsg = `API Error: ${response.status}`;
     try {
-        // 【修复】先读取响应文本，然后尝试解析JSON
-        const responseText = await response.text();
-        try {
-            const errorData = JSON.parse(responseText);
-            // 安全地获取错误信息，如果结构不符合预期，就将整个错误对象转为字符串
-            errorMsg += ` - ${errorData?.error?.message || JSON.stringify(errorData)}`;
-        } catch (parseError) {
-            // 如果不是JSON格式，直接使用文本内容
-            errorMsg += ` - ${responseText}`;
-        }
+        // 尝试解析错误信息体为JSON
+        const errorData = await response.json();
+        // 安全地获取错误信息，如果结构不符合预期，就将整个错误对象转为字符串
+        errorMsg += ` - ${errorData?.error?.message || JSON.stringify(errorData)}`;
     } catch (jsonError) {
-        // 如果读取响应失败，使用通用错误信息
-        errorMsg += ` - 无法读取错误详情`;
+        // 如果连JSON都不是，就直接读取文本
+        errorMsg += ` - ${await response.text()}`;
     }
     // 抛出一个包含了详细信息的错误，这样就不会在catch块里再次出错了
     throw new Error(errorMsg);
@@ -8516,6 +8559,7 @@ case 'send_and_recall': {
                     aiMessage = { ...baseMessage, type: 'sticker', content: msgData.url, meaning: msgData.meaning || '' };
                     break;
                 case 'ai_image':
+                    
                     aiMessage = { ...baseMessage, type: 'ai_image', content: msgData.description };
                     break;
                 case 'voice_message':
@@ -8556,6 +8600,7 @@ case 'send_and_recall': {
                             notificationText = `[收到一个外卖代付请求]`;
                             break;
                         case 'ai_image':
+                            
                             notificationText = `[图片]`;
                             break;
                         case 'voice_message':
@@ -9248,13 +9293,8 @@ try {
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            try {
-                const errorData = JSON.parse(errorText);
-                throw new Error(`API请求失败: ${response.status} - ${JSON.stringify(errorData)}`);
-            } catch (parseError) {
-                throw new Error(`API请求失败: ${response.status} - ${errorText}`);
-            }
+            const errorData = await response.json();
+            throw new Error(`API请求失败: ${response.status} - ${JSON.stringify(errorData)}`);
         }
         const data = await response.json();
         // 检查是否有有效回复
@@ -10742,15 +10782,7 @@ ${videoCallState.preCallContext}
                 model: model, messages: messagesForApi, temperature: 0.8
             })
         });
-        if (!response.ok) {
-            const errorText = await response.text();
-            try {
-                const errorData = JSON.parse(errorText);
-                throw new Error(errorData.error.message);
-            } catch (parseError) {
-                throw new Error(errorText);
-            }
-        }
+        if (!response.ok) throw new Error((await response.json()).error.message);
         
         const data = await response.json();
         const aiResponse = data.choices[0].message.content;
@@ -11135,13 +11167,8 @@ ${contextSummary}
             })
         });
         if (!response.ok) {
-            const errorText = await response.text();
-            try {
-                const errorData = JSON.parse(errorText);
-                throw new Error(`API 请求失败: ${response.status} - ${errorData.error.message}`);
-            } catch (parseError) {
-                throw new Error(`API 请求失败: ${response.status} - ${errorText}`);
-            }
+            const errorData = await response.json();
+            throw new Error(`API 请求失败: ${response.status} - ${errorData.error.message}`);
         }
         
         const data = await response.json();
@@ -13393,6 +13420,93 @@ document.getElementById('confirm-create-post-btn').addEventListener('click', asy
         }
     }
     // --- 修正结束 ---
+// === 用户发布动态后，触发AI角色自动互动 ===
+setTimeout(async () => {
+    try {
+        // 获取所有好友角色
+        const allChats = await db.chats.toArray();
+        const friendChats = allChats.filter(chat => 
+            chat.relationship?.status === 'friend' && 
+            !chat.isGroup && 
+            chat.id !== 'user'
+        );
+        
+        // 随机选择一些角色进行互动
+        const interactingChats = friendChats.sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random() * 3) + 2);
+        
+        for (const chat of interactingChats) {
+            // 延迟执行，模拟真实互动时间
+            setTimeout(async () => {
+// 自动点赞 (80%概率)
+if (Math.random() < 0.8) {
+    const post = await db.qzonePosts.get(newPostId);
+    if (post) {
+        // 确保 likes 是数组
+        if (!post.likes || !Array.isArray(post.likes)) {
+            post.likes = [];
+        }
+        // 检查是否已经点赞
+        if (!post.likes || !Array.isArray(post.likes) || !post.likes.includes(chat.name)) {
+
+            post.likes.push(chat.name);
+            await db.qzonePosts.put(post);
+            console.log(`${chat.name} 自动点赞了用户的动态`);
+        }
+    }
+}
+
+                
+                // 自动评论 (60%概率)
+                if (Math.random() < 0.6) {
+                    // 构建评论请求
+                    const recentMessages = await db.messages.where('chatId').equals(chat.id).reverse().limit(10).toArray();
+                    const recentContext = recentMessages.map(m => `${m.sender}: ${m.content}`).join('\n');
+                    
+                    const commentPrompt = `
+你是${chat.name}。用户刚刚发布了一条动态："${postSummary}"
+请根据你的人设、世界书信息和你们最近的聊天内容，对这条动态发表一个简短的评论。
+最近聊天内容：${recentContext}
+请直接回复评论内容，不要包含其他格式。`;
+
+                    // 发送API请求获取评论
+               const response = await fetch('/v1/chat/completions', {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.globalSettings.apiKey}`
+    },
+    body: JSON.stringify({
+        model: state.globalSettings.model,
+        messages: [{ role: 'user', content: commentPrompt }],
+        max_tokens: 100
+    })
+});
+
+                    
+                    const data = await response.json();
+                    if (data.choices?.[0]?.message?.content) {
+                        const commentText = data.choices[0].message.content.trim();
+                        
+                        // 添加评论到动态
+                        const post = await db.qzonePosts.get(newPostId);
+                        if (post) {
+                            if (!post.comments) post.comments = [];
+                            post.comments.push({
+                                commenterName: chat.name,
+                                commentText: commentText,
+                                timestamp: Date.now()
+                            });
+                            await db.qzonePosts.put(post);
+                            console.log(`${chat.name} 自动评论了用户的动态: ${commentText}`);
+                        }
+                    }
+                }
+            }, Math.random() * 5000 + 2000); // 2-7秒随机延迟
+        }
+    } catch (error) {
+        console.error('自动互动出错:', error);
+    }
+}, 1000); // 1秒后开始执行
 
     await renderQzonePosts();
     modal.classList.remove('visible');
@@ -13611,7 +13725,8 @@ postsList.addEventListener('click', async (e) => {
                         const aiChats = Object.values(window.state.chats).filter(chat => !chat.isGroup);
                         if (aiChats.length > 0) {
                             const randomAI = aiChats[Math.floor(Math.random() * aiChats.length)];
-                            if (!post.likes.includes(randomAI.name)) {
+                          if (!post.likes || !Array.isArray(post.likes) || !post.likes.includes(randomAI.name)) {
+
                                 post.likes.push(randomAI.name);
                                 await db.qzonePosts.update(postId, { likes: post.likes });
                                 renderQzonePosts();
@@ -13660,6 +13775,65 @@ postsList.addEventListener('click', async (e) => {
             }
         }
         commentInput.value = '';
+        // === 检查用户是否回复了AI角色的评论，如果是则AI需要回复 ===
+if (commentText.includes('@')) {
+    const mentionedName = commentText.match(/@([^\s]+)/)?.[1];
+    if (mentionedName && mentionedName !== '用户') {
+        const mentionedChat = await db.chats.where('name').equals(mentionedName).first();
+        if (mentionedChat && !mentionedChat.isGroup) {
+            // 延迟回复，模拟真实互动
+            setTimeout(async () => {
+                try {
+                    const currentPost = await db.qzonePosts.get(postId);
+                    const recentMessages = await db.messages.where('chatId').equals(mentionedChat.id).reverse().limit(10).toArray();
+                    const recentContext = recentMessages.map(m => `${m.sender}: ${m.content}`).join('\n');
+                    
+                    const replyPrompt = `
+你是${mentionedName}。在动态"${currentPost.content || currentPost.publicText || '(图片动态)'}"下，用户回复了你的评论："${commentText}"
+请根据你的人设、世界书信息和你们最近的聊天内容，对用户的回复进行回应。
+最近聊天内容：${recentContext}
+请直接回复内容，不要包含其他格式。`;
+
+                const response = await fetch('/v1/chat/completions', {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.globalSettings.apiKey}`
+    },
+    body: JSON.stringify({
+        model: state.globalSettings.model,
+        messages: [{ role: 'user', content: replyPrompt }],
+        max_tokens: 100
+    })
+});
+
+                    
+                    const data = await response.json();
+                    if (data.choices?.[0]?.message?.content) {
+                        const replyText = data.choices[0].message.content.trim();
+                        
+                        if (!currentPost.comments) currentPost.comments = [];
+                        currentPost.comments.push({
+                            commenterName: mentionedName,
+                            commentText: `@用户 ${replyText}`,
+                            timestamp: Date.now()
+                        });
+                        await db.qzonePosts.put(currentPost);
+                        console.log(`${mentionedName} 回复了用户的评论: ${replyText}`);
+                        
+                        // 刷新动态显示
+                        if (document.getElementById('qzone-screen').classList.contains('active')) {
+                            await renderQzonePosts();
+                        }
+                    }
+                } catch (error) {
+                    console.error('AI自动回复出错:', error);
+                }
+            }, Math.random() * 3000 + 2000); // 2-5秒延迟
+        }
+    }
+}
+
         await renderQzonePosts();
         return;
     }
@@ -14584,6 +14758,7 @@ document.getElementById('chat-messages').addEventListener('click', (e) => {
 
     // 2. 找到相关的DOM元素
     const bubble = voiceBody.closest('.message-bubble');
+    
     if (!bubble) return;
     
     const spinner = voiceBody.querySelector('.loading-spinner');
@@ -14605,17 +14780,21 @@ document.getElementById('chat-messages').addEventListener('click', (e) => {
         spinner.style.display = 'block';   // 显示加载动画
 
         // 模拟1.5秒的语音识别过程
-        setTimeout(() => {
-            // 检查此时元素是否还存在（可能用户已经切换了聊天）
-            if (document.body.contains(bubble)) {
-                const voiceText = bubble.dataset.voiceText || '(无法识别)';
-                transcriptEl.textContent = voiceText; // 填充文字
-                
-                spinner.style.display = 'none';      // 隐藏加载动画
-                transcriptEl.style.display = 'block';// 显示文字
-                bubble.dataset.state = 'expanded';     // 进入展开状态
-            }
-        }, 1500);
+      setTimeout(() => {
+    // 重新查找 bubble 元素，避免作用域问题
+    const currentBubble = voiceBody.closest('.message-bubble');
+    if (currentBubble && document.body.contains(currentBubble)) {
+        const voiceText = currentBubble.dataset.voiceText || '(无法识别)';
+        const transcriptEl = currentBubble.querySelector('.voice-transcript');
+        const spinner = voiceBody.querySelector('.loading-spinner');
+        
+        transcriptEl.textContent = voiceText;
+        spinner.style.display = 'none';
+        transcriptEl.style.display = 'block';
+        currentBubble.dataset.state = 'expanded';
+    }
+}, 1500);
+
     }
 });
 
@@ -15168,6 +15347,63 @@ document.addEventListener('DOMContentLoaded', function() {
                     // 30%概率触发AI回复
                     if (Math.random() < 0.3) {
                         triggerAutoReplyFromAI(postId, commentText);
+
+// === 用户评论AI角色动态后，AI角色主动回复 ===
+setTimeout(async () => {
+    try {
+        const post = await db.qzonePosts.get(postId);
+        if (post && post.authorName && post.authorName !== '用户' && post.authorName !== state.qzoneSettings.nickname) {
+            // 这是AI角色的动态，用户评论了，AI需要回复
+            const authorChat = await db.chats.where('name').equals(post.authorName).first();
+            if (authorChat && !authorChat.isGroup) {
+                const recentMessages = await db.messages.where('chatId').equals(authorChat.id).reverse().limit(10).toArray();
+                const recentContext = recentMessages.map(m => `${m.sender}: ${m.content}`).join('\n');
+                
+                const replyPrompt = `
+你是${post.authorName}。用户在你的动态"${post.content || post.publicText || post.imageDescription || '(图片动态)'}"下评论了："${commentText}"
+请根据你的人设、世界书信息、动态内容和你们最近的聊天内容，对用户的评论进行回应。
+最近聊天内容：${recentContext}
+请直接回复内容，不要包含其他格式。`;
+
+             const response = await fetch('/v1/chat/completions', {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.globalSettings.apiKey}`
+    },
+    body: JSON.stringify({
+        model: state.globalSettings.model,
+        messages: [{ role: 'user', content: replyPrompt }],
+        max_tokens: 100
+    })
+});
+
+                
+                const data = await response.json();
+                if (data.choices?.[0]?.message?.content) {
+                    const replyText = data.choices[0].message.content.trim();
+                    
+                    if (!post.comments) post.comments = [];
+                    post.comments.push({
+                        commenterName: post.authorName,
+                        commentText: `@用户 ${replyText}`,
+                        timestamp: Date.now()
+                    });
+                    await db.qzonePosts.put(post);
+                    console.log(`${post.authorName} 回复了用户对其动态的评论: ${replyText}`);
+                    
+                    // 刷新动态显示
+                    if (document.getElementById('qzone-screen').classList.contains('active')) {
+                        await renderQzonePosts();
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('AI动态作者自动回复出错:', error);
+    }
+}, Math.random() * 4000 + 3000); // 3-7秒延迟
+
                     }
                 }
             }
